@@ -1,1 +1,1 @@
-from laishime.app import application
+from laishime import application
