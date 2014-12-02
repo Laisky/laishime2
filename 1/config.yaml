@@ -1,0 +1,27 @@
+name: laishime
+version: 1
+
+
+
+# cron:
+# - description: cron backuptweets
+#   url: /trigger
+#   schedule: every 10 mins
+
+
+
+handlers:
+- url: static/
+  static_path: static
+
+# - url: static/css/
+#   static_path: static/css
+
+# - url: static/icons/
+#   static_path: static/icons
+
+# - url: static/img/
+#   static_path: static/img
+
+# - url: static/js/
+#   static_path: static/js
