@@ -31,11 +31,6 @@ class Application(tornado.wsgi.WSGIApplication):
             'autoescape': None,
         }
         handlers = [
-            # -------------- static file --------------
-            (r'/(apple-touch-icon\.png)', tornado.web.StaticFileHandler,
-                dict(path=settings['static_path'])),
-            (r'/(favicon\.ico)', tornado.web.StaticFileHandler,
-                dict(path=settings['static_path'])),
             # -------------- handler --------------
         ]
         handlers.append(('/(.*)', PageNotFound))

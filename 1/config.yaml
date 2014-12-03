@@ -12,7 +12,7 @@ version: 1
 
 handlers:
 - url: static/
-  static_path: static
+  static_path: laishime/static
 
 # - url: static/css/
 #   static_path: static/css
