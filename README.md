@@ -11,6 +11,7 @@ python project for fun
 
 ```sh
 $ cd laishime2/1
+$ python bootstrap.sh
 $ bin/buildout install
 $ bin/python setup.py develop
 $ bin/python -m laishime
