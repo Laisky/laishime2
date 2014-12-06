@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+import laishime
 
-# PWD = os.path.dirname(sys.executable)
-PWD = os.path.join(os.getcwd(), 'laishime')
+
+PWD = os.path.dirname(laishime.__file__)
