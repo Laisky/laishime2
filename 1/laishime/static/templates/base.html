@@ -14,12 +14,12 @@
     <link rel="apple-touch-icon" href="{{ static_url("apple-touch-icon.png") }}">
     <script language="javascript" type="text/javascript">
         $(function(){
-            $(window).resize(welcome_go_center);
-            welcome_go_center();
-        })
+            $(window).resize(set_welcome_in_center);
+            set_welcome_in_center();
+        });
 
 
-        function welcome_go_center(){
+        function set_welcome_in_center(){
             $("#welcome").css("left", $(window).width() / 2 - 57);
         }
 

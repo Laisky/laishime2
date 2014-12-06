@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import tornado.wsgi
 
 
-def create_wsgi_app(c):
-    print('create_wsgi_app: {}'.format(c))
+def create_wsgi_app(app):
+    return tornado.wsgi.WSGIAdapter(app)
