@@ -1,9 +1,4 @@
 ---
-weibo:
-    APP_KEY: 633916759
-    APP_SECRET: 0145ff1d7a071a0a8344279cfebf09dc
-    CALLBACK_URL: laishime.sinaapp.com/weibo_authorize
-
 twitter:
     CONSUMER_KEY: S6EDKLg7WmZsHVnGxBFFIA
     CONSUMER_SECRET: oeDkQFBAhTioFNXurRB6UR7Np4N7AORpfuXvbho
