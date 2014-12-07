@@ -5,6 +5,8 @@ import os
 
 import tornado.wsgi
 import tornado.web
+import tornado.options
+
 try:
     import sae
 except ImportError:
