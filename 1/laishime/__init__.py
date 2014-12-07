@@ -10,10 +10,10 @@ import tornado.options
 try:
     import sae
 except ImportError:
-    from laishime.tests import sae
+    from .tests import sae
 
-from laishime.const import PWD
-from laishime.views.base import BaseHandler
+from .const import PWD
+from .views.base import BaseHandler
 
 
 class PageNotFound(BaseHandler):

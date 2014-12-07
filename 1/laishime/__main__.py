@@ -4,8 +4,8 @@ import wsgiref.simple_server
 import tornado.options as opt
 from tornado.options import define, options
 
-from laishime import application
-from laishime.const import PWD
+from . import application
+from .const import PWD
 
 
 define("config", default=os.path.join(PWD, 'config', 'server.conf'))
