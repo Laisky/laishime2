@@ -10,5 +10,5 @@ requires = [str(i.req) for i in parse_requirements('requirements.txt')
 
 setup(name='laishime',
       version='2.1',
-      package=find_packages('laishime'),
+      packages=find_packages('laishime'),
       install_requires=requires)
