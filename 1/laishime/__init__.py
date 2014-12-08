@@ -13,7 +13,7 @@ except ImportError:
     from .tests import sae
 
 from .const import PWD
-from .views.base import BaseHandler
+from .views import BaseHandler
 
 
 class PageNotFound(BaseHandler):

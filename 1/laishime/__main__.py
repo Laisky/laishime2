@@ -9,7 +9,7 @@ from .const import PWD
 
 
 define("config", default=os.path.join(PWD, 'config', 'server.conf'))
-define("port", default=8080, type=int)
+define("port", default=27800, type=int)
 
 
 opt.parse_config_file(options.config)
