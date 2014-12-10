@@ -31,6 +31,9 @@ class TemplateRendering:
 
 
 class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
+    def redirect_404(self):
+        self.redirect('/404.html')
+
     def render(self, template_name, **kwargs):
         """
         This is for making some extra context variables available to

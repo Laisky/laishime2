@@ -1,0 +1,57 @@
+body {
+    background: url(http://laisky-blog.qiniudn.com/background-1500x844.jpg) repeat fixed 0 0;
+}
+
+p {
+    font-family: "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+    color: #ddd;
+}
+
+nav {
+    line-height: 1.3;
+    border-bottom-style: dotted;
+    border-width: 2px;
+    border-color: rgba(193, 181, 133, 0.62);
+}
+
+nav h1 {
+    font-size: 1em;
+    color: #7fe22e;
+}
+
+ul {
+    color: #eee;
+    font-size: 1em;
+}
+
+nav > li:hover {
+    padding-left: 10px;
+}
+
+article p:hover {
+    color: #fff;
+}
+
+a:link {
+    color: #66d9ef;
+
+    text-decoration: none;
+}
+
+a:visited {
+    color: #ae81ff;
+}
+
+a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#container {
+    background-color: rgba(40, 41, 35, 0.8);
+    width: 90%;
+    min-height: 650px;
+    margin: 20px auto;
+    padding: 20px;
+    position: relative;
+}

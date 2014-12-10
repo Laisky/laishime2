@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block head%}
+{{ super() }}
+<link rel="stylesheet" href="{{ static_url("css/topic_tweets.css") }}">
+{% endblock %}
+{% block body%}
+{{ super() }}
+<div class="container-fluid">
+<div class="row-fluid">
+    <!-- navigator -->
+    <div class="span2">
+        <!-- sorted by count -->
+        <div id="navigator">
+        <div class="row-fluid">
+            <nav title="ordered by count">
+                <h1>ordered by count</h1>
+            </nav>
+        </div>
+        <div class="row-fluid">
+            <nav title="ordered by update time">
+                <h1>ordered by update time</h1>
+            </nav>
+        </div>
+        </div>
+    </div>
+    <!-- tweets -->
+    <div class="span10">
+        <div id="container">
+            <article id="tweets">
+                <p>tweets</p>
+            </article>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
+

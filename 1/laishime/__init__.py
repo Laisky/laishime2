@@ -13,12 +13,13 @@ except ImportError:
     from .tests import sae
 
 from .const import PWD
-from .views import BaseHandler
+from .views import BaseHandler, TopicTweets
 
 
 class PageNotFound(BaseHandler):
-    def get(self, url):
+    def get(self, url=''):
         self.render('404.html', url=url)
+        self.finish()
 
 
 class Application(tornado.wsgi.WSGIApplication):
@@ -34,6 +35,8 @@ class Application(tornado.wsgi.WSGIApplication):
         }
         handlers = [
             # -------------- handler --------------
+            ('/404.html', PageNotFound),
+            ('/topic_tweets/(.*)', TopicTweets)
         ]
         handlers.append(('/(.*)', PageNotFound))
         super(Application, self).__init__(handlers, **settings)
