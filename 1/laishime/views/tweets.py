@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import json
 
-from pipe import as_list
 from tornado.web import asynchronous
 
 from laishime.views import BaseHandler, DBMixin
@@ -26,11 +25,12 @@ class TopicTweets(BaseHandler, DBMixin):
         """
         {'topic': '', 'timestamp': ''}
         """
+        tweets = self.conn.twitter.tweets
         last_update_topics = []
-        docus = self.conn.twitter.find(
+        docus = tweets.find(
             {'topics': {'$ne': []}},
             {'topics': 1, 'timestamp': 1}
-        ).sort({'timestamp': -1}) | as_list
+        ).sort('timestamp', -1)
         topics = []
         for docu in docus:
             for t in docu['topics']:

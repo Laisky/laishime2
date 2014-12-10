@@ -7,7 +7,7 @@ from pymongo import MongoClient
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
 
-class TemplateRendering:
+class TemplateRendering():
     """
     A simple class to hold methods for rendering templates.
     Copied from
@@ -55,5 +55,6 @@ class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
         self.write(content)
 
 
-class DBMixin:
+class DBMixin():
     conn = MongoClient()
+    # conn = MongoClient(host='128.199.219.106')
