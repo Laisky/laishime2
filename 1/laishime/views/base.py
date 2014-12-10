@@ -3,6 +3,7 @@
 import os
 
 import tornado.web
+from pymongo import MongoClient
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
 
@@ -52,3 +53,7 @@ class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
         })
         content = self.render_template(template_name, **kwargs)
         self.write(content)
+
+
+class DBMixin:
+    conn = MongoClient()
