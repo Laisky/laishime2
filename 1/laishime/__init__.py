@@ -44,7 +44,7 @@ class Application(tornado.wsgi.WSGIApplication):
         self.setup_db()
 
     def setup_db(self):
-        self.db = MotorClient(host='128.199.219.106')
+        self.db = MotorClient()
 
 
 application = sae.create_wsgi_app(Application())
