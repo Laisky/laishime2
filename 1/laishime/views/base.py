@@ -3,7 +3,8 @@
 import os
 
 import tornado.web
-from pymongo import MongoClient
+from motor import MotorClient
+# from pymongo import MongoClient
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
 
@@ -56,5 +57,6 @@ class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
 
 
 class DBMixin():
-    conn = MongoClient()
+    conn = MotorClient(host='128.199.219.106')
+    # conn = MongoClient()
     # conn = MongoClient(host='128.199.219.106')
