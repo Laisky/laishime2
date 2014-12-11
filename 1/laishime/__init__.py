@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import os
+import logging
 
 from motor import MotorClient
 import tornado.wsgi
 import tornado.web
-import tornado.options
+from tornado.options import define, options
 
 try:
     import sae
@@ -15,6 +15,13 @@ except ImportError:
 
 from .const import PWD
 from .views import BaseHandler, TopicTweets
+
+
+# logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('Application')
+define('config', default=os.path.join(PWD, 'config', 'server.conf'))
+define('port', default=27800, type=int)
+define('debug', default=False, type=bool)
 
 
 class PageNotFound(BaseHandler):
@@ -44,7 +51,12 @@ class Application(tornado.wsgi.WSGIApplication):
         self.setup_db()
 
     def setup_db(self):
-        self.db = MotorClient()
+        if options.debug:
+            log.debug('start application in debug')
+            self.db = MotorClient(host='128.199.219.106')
+        else:
+            log.debug('start application in normal')
+            self.db = MotorClient()
 
 
 application = sae.create_wsgi_app(Application())
