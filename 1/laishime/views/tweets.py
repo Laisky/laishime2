@@ -6,10 +6,10 @@ import pymongo
 from tornado import gen
 from tornado.web import asynchronous
 
-from laishime.views import BaseHandler, DBMixin
+from laishime.views import BaseHandler
 
 
-class TopicTweets(BaseHandler, DBMixin):
+class TopicTweets(BaseHandler):
 
     @asynchronous
     def get(self, url):
@@ -30,7 +30,7 @@ class TopicTweets(BaseHandler, DBMixin):
         {'topic': '', 'timestamp': ''}
         """
         n_topics = int(self.get_argument('n_topics', 5))
-        tweets = self.conn.twitter.tweets
+        tweets = self.db.twitter.tweets
         last_update_topics = []
         topics = []
 

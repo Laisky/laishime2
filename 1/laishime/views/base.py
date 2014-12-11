@@ -3,8 +3,6 @@
 import os
 
 import tornado.web
-from motor import MotorClient
-# from pymongo import MongoClient
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 
 
@@ -33,6 +31,10 @@ class TemplateRendering():
 
 
 class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
+    @property
+    def db(self):
+        return self.application.db
+
     def redirect_404(self):
         self.redirect('/404.html')
 
@@ -54,9 +56,3 @@ class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
         })
         content = self.render_template(template_name, **kwargs)
         self.write(content)
-
-
-class DBMixin():
-    conn = MotorClient(host='128.199.219.106')
-    # conn = MongoClient()
-    # conn = MongoClient(host='128.199.219.106')

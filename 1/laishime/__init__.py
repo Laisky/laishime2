@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 import os
 
+from motor import MotorClient
 import tornado.wsgi
 import tornado.web
 import tornado.options
@@ -40,6 +41,10 @@ class Application(tornado.wsgi.WSGIApplication):
         ]
         handlers.append(('/(.*)', PageNotFound))
         super(Application, self).__init__(handlers, **settings)
+        self.setup_db()
+
+    def setup_db(self):
+        self.db = MotorClient(host='128.199.219.106')
 
 
 application = sae.create_wsgi_app(Application())
