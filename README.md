@@ -1,18 +1,18 @@
 Laishime 2.1
 ---
 
-python project for fun
+Python3.4 project for fun
 
 [http://hime.laisky.us](http://hime.laisky.us)
 
 ### Deploy
 
-#### Local
+#### Run
 
 ```sh
-$ cd laishime2/1
-$ python bootstrap.sh
-$ bin/buildout install
+$ cd laishime2/src
+$ python -m venv .
+$ source bin/activate
 $ bin/python setup.py develop
 $ bin/python -m laishime
 ```
