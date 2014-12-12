@@ -14,13 +14,16 @@ log = logging.getLogger(__name__)
 
 
 class TopicTweets(BaseHandler):
+    _default_n_tweets = 50
+    _default_n_topics = 5
 
     @asynchronous
     def get(self, url):
         router = {
             'index.html': self.index_page,
             'last-update-topics': self.get_last_update_topics,
-            'most-post-topics': self.get_most_post_topics
+            'most-post-topics': self.get_most_post_topics,
+            'get-tweets-by-topic': self.get_tweets_by_topic
         }
         router.get(url, self.redirect_404)()
 
@@ -30,15 +33,34 @@ class TopicTweets(BaseHandler):
 
         tweets = self.db.twitter.tweets
         cursor = tweets.find({}, {'text': 1}).\
-            sort([{'timestamp', pymongo.DESCENDING}])
+            sort([{'timestamp', pymongo.DESCENDING}]).\
+            limit(self._default_n_tweets)
         articles = []
 
-        for docu in (yield cursor.to_list(length=20)):
+        while (yield cursor.fetch_next):
+            docu = cursor.next_object()
             articles.append(docu['text'])
 
         articles = '<p>' + '</p><p>'.join(articles) + '</p>'
 
         self.render('topic_tweets.html', articles=articles)
+        self.finish()
+
+    @gen.coroutine
+    def get_tweets_by_topic(self):
+        topic = str(self.get_argument('topic', strip=True))
+        tweets = self.db.twitter.tweets
+        articles = []
+        cursor = tweets.find({'topics': topic}, {'text': 1}).\
+            limit(self._default_n_tweets)
+
+        while (yield cursor.fetch_next):
+            docu = cursor.next_object()
+            articles.append(docu['text'])
+
+        articles = '<p>' + '</p><p>'.join(articles) + '</p>'
+
+        self.write_json(data=articles)
         self.finish()
 
     @gen.coroutine
@@ -48,7 +70,7 @@ class TopicTweets(BaseHandler):
         """
         log.info('get_last_update_topics')
 
-        n_topics = int(self.get_argument('n_topics', 5))
+        n_topics = int(self.get_argument('n_topics', self._default_n_topics))
         tweets = self.db.twitter.tweets
         last_update_topics = []
         topics = []
@@ -78,7 +100,7 @@ class TopicTweets(BaseHandler):
     def get_most_post_topics(self):
         log.info('get_most_post_topics')
 
-        n_topics = int(self.get_argument('n_topics', 5))
+        n_topics = int(self.get_argument('n_topics', self._default_n_topics))
         statistics = self.db.twitter.statistics
         most_post_topics = []
 
