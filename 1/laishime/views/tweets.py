@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import json
 import logging
 from collections import Counter
 
@@ -11,8 +10,10 @@ from tornado.web import asynchronous
 from laishime.views import BaseHandler
 
 
+log = logging.getLogger(__name__)
+
+
 class TopicTweets(BaseHandler):
-    log = logging.getLogger('laishime.views.TopicTweets')
 
     @asynchronous
     def get(self, url):
@@ -23,8 +24,21 @@ class TopicTweets(BaseHandler):
         }
         router.get(url, self.redirect_404)()
 
+    @gen.coroutine
     def index_page(self):
-        self.render('topic_tweets.html')
+        log.info('index_page')
+
+        tweets = self.db.twitter.tweets
+        cursor = tweets.find({}, {'text': 1}).\
+            sort([{'timestamp', pymongo.DESCENDING}])
+        articles = []
+
+        for docu in (yield cursor.to_list(length=20)):
+            articles.append(docu['text'])
+
+        articles = '<p>' + '</p><p>'.join(articles) + '</p>'
+
+        self.render('topic_tweets.html', articles=articles)
         self.finish()
 
     @gen.coroutine
@@ -32,7 +46,7 @@ class TopicTweets(BaseHandler):
         """
         {'topic': '', 'timestamp': ''}
         """
-        self.log.info('get_last_update_topics')
+        log.info('get_last_update_topics')
 
         n_topics = int(self.get_argument('n_topics', 5))
         tweets = self.db.twitter.tweets
@@ -44,14 +58,12 @@ class TopicTweets(BaseHandler):
             sort([('timestamp', pymongo.DESCENDING)])
 
         for docu in (yield cursor.to_list(length=n_topics * 2)):
-            docu = cursor.next_object()
             for topic in docu['topics']:
                 if topic not in topics:
                     topics.append(topic)
-                    last_update_topics.append({
-                        'topic': topic,
-                        'timestamp': str(docu['timestamp'])
-                    })
+                    last_update_topics.append(
+                        {'topic': topic, 'timestamp': str(docu['timestamp'])}
+                    )
 
                 if len(topics) >= n_topics:
                     break
@@ -59,12 +71,12 @@ class TopicTweets(BaseHandler):
             if len(topics) >= n_topics:
                 break
 
-        self.write(json.dumps(last_update_topics))
+        self.write_json(data=last_update_topics)
         self.finish()
 
     @gen.coroutine
     def get_most_post_topics(self):
-        self.log.info('get_most_post_topics')
+        log.info('get_most_post_topics')
 
         n_topics = int(self.get_argument('n_topics', 5))
         statistics = self.db.twitter.statistics
@@ -74,10 +86,9 @@ class TopicTweets(BaseHandler):
 
         topics = Counter(docu['topics_count']).most_common()[: n_topics]
         for (topic, n) in topics:
-            most_post_topics.append({
-                'topic': topic,
-                'count': n
-            })
+            most_post_topics.append(
+                {'topic': topic, 'count': n}
+            )
 
-        self.write(json.dumps(most_post_topics))
+        self.write_json(data=most_post_topics)
         self.finish()

@@ -1,10 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import logging
+import contextlib.contextmanager
+
 import tornado
 from multiprocessing.pool import ThreadPool
 
 
+log = logging.getLogger(__name__)
 _workers = ThreadPool(10)
+
+
+@contextlib.contextmanager
+def trace_in_coroutine():
+    try:
+        yield
+    except Exception:
+        log.error("exception in asynchronous operation")
 
 
 class BackgroundMixin(tornado.web.RequestHandler):

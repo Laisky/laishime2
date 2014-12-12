@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import json
+import logging
 
 import tornado.web
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
+
+from .status import OK
+
+
+log = logging.getLogger(__name__)
 
 
 class TemplateRendering():
@@ -34,6 +41,13 @@ class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
     @property
     def db(self):
         return self.application.db
+
+    def write_json(self, *, status=OK, msg='', data={}):
+        self.write(json.dumps({
+            'status': status,
+            'msg': msg,
+            'data': data
+        }))
 
     def redirect_404(self):
         self.redirect('/404.html')
