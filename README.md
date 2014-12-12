@@ -11,7 +11,7 @@ Python3.4 project for fun
 
 ```sh
 $ cd laishime2/src
-$ python -m venv .
+$ python3 -m venv .
 $ source bin/activate
 $ bin/python setup.py develop
 $ bin/python -m laishime
