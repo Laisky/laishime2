@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
 import traceback
 from datetime import datetime
 import logging
@@ -150,9 +151,11 @@ class TopicTweets(BaseHandler):
         log.debug('crawler_tweets')
 
         try:
+            #TODO modularity!
             account = self.db.twitter.account
             tweets = self.db.twitter.tweets
             uid = 105351466
+            reg_topic = re.compile(r"[\b|\s]#(\S+)")
             auth = OAuthHandler(
                 'S6EDKLg7WmZsHVnGxBFFIA',
                 'oeDkQFBAhTioFNXurRB6UR7Np4N7AORpfuXvbho'
@@ -175,6 +178,7 @@ class TopicTweets(BaseHandler):
                 if tweet['id'] <= last_stored_tweet['id']:
                     continue
 
+                tweet['topics'] = reg_topic.findall(tweet['text'])
                 tweet['created_at'] = datetime.strptime(
                     tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'
                 )
