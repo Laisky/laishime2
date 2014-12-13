@@ -28,6 +28,7 @@ class TopicTweets(BaseHandler):
         }
         router.get(url, self.redirect_404)()
 
+    @gen.coroutine
     def index_page(self):
         log.info('index_page from {}'.format(self.ip))
 
@@ -36,7 +37,7 @@ class TopicTweets(BaseHandler):
             articles = []
 
             cursor = tweets.find({}, {'text': 1}).\
-                sort([{'timestamp', pymongo.DESCENDING}]).\
+                sort([('timestamp', pymongo.DESCENDING)]).\
                 limit(self._default_n_tweets)
 
             while (yield cursor.fetch_next):
@@ -46,7 +47,7 @@ class TopicTweets(BaseHandler):
             articles = '<p>' + '</p><p>'.join(articles) + '</p>'
             self.render('topic_tweets.html', articles=articles)
         except:
-            log.error(traceback.format_exc)
+            log.error(traceback.format_exc())
         finally:
             self.finish()
 
@@ -69,7 +70,7 @@ class TopicTweets(BaseHandler):
 
             self.write_json(data=articles)
         except:
-            log.error(traceback.format_exc)
+            log.error(traceback.format_exc())
         finally:
             self.finish()
 
@@ -110,7 +111,7 @@ class TopicTweets(BaseHandler):
             last_update_topics = ''.join(last_update_topics)
             self.write_json(data=last_update_topics)
         except:
-            log.error(traceback.format_exc)
+            log.error(traceback.format_exc())
         finally:
             self.finish()
 
@@ -130,7 +131,7 @@ class TopicTweets(BaseHandler):
             topics = Counter(docu['topics_count']).most_common()[: n_topics]
             for (topic, n) in topics:
                 most_post_topics.append(
-                    """<li title="{count::2d}">{}</li>"""
+                    """<li title="{:2d}">{}</li>"""
                     .format(n, topic)
                 )
 

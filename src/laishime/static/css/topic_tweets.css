@@ -24,7 +24,7 @@ ul {
     font-size: 1em;
 }
 
-nav > li:hover {
+.topics > li:hover {
     padding-left: 10px;
 }
 
@@ -32,17 +32,17 @@ article p:hover {
     color: #fff;
 }
 
-a:link {
+.topics > li:link {
     color: #66d9ef;
 
     text-decoration: none;
 }
 
-a:visited {
+.topics > li:visited {
     color: #ae81ff;
 }
 
-a:hover {
+.topics > li:hover {
     text-decoration: underline;
     cursor: pointer;
 }
