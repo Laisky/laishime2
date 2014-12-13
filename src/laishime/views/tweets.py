@@ -41,7 +41,7 @@ class TopicTweets(BaseHandler):
             articles = []
 
             cursor = tweets.find({}, {'text': 1}).\
-                sort([('timestamp', pymongo.DESCENDING)]).\
+                sort([('created_at', pymongo.DESCENDING)]).\
                 limit(self._default_n_tweets)
 
             while (yield cursor.fetch_next):
@@ -81,7 +81,7 @@ class TopicTweets(BaseHandler):
     @gen.coroutine
     def get_last_update_topics(self):
         """
-        {'topic': '', 'timestamp': ''}
+        {'topic': '', 'created_at': ''}
         """
         log.debug('get_last_update_topics')
 
@@ -94,8 +94,8 @@ class TopicTweets(BaseHandler):
             topics = []
 
             cursor = tweets.find({'topics': {'$ne': []}},
-                                 {'topics': 1, 'timestamp': 1}).\
-                sort([('timestamp', pymongo.DESCENDING)])
+                                 {'topics': 1, 'created_at': 1}).\
+                sort([('created_at', pymongo.DESCENDING)])
 
             for docu in (yield cursor.to_list(length=n_topics * 2)):
                 for topic in docu['topics']:
@@ -103,7 +103,7 @@ class TopicTweets(BaseHandler):
                         topics.append(topic)
                         last_update_topics.append(
                             """<li title="{}">{}</li>"""
-                            .format(str(docu['timestamp']), topic)
+                            .format(str(docu['created_at']), topic)
                         )
 
                     if len(topics) >= n_topics:
@@ -180,8 +180,9 @@ class TopicTweets(BaseHandler):
                 )
 
                 yield tweets.update(
-                    {'id': tweets['id']}, {'$set': tweet}, upsert=True
+                    {'id': tweet['id']}, {'$set': tweet}, upsert=True
                 )
+                log.debug('updated {}'.format(tweet['id']))
         except:
             log.error(traceback.format_exc())
         finally:
