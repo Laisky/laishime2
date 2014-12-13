@@ -180,7 +180,7 @@ class TopicTweets(BaseHandler):
                 )
 
                 yield tweets.update(
-                    {'id': tweets['id']}, tweet, upsert=True
+                    {'id': tweets['id']}, {'$set': tweet}, upsert=True
                 )
         except:
             log.error(traceback.format_exc())
