@@ -21,96 +21,116 @@ class TopicTweets(BaseHandler):
     def get(self, url):
         router = {
             'index.html': self.index_page,
-            'last-update-topics': self.get_last_update_topics,
-            'most-post-topics': self.get_most_post_topics,
-            'get-tweets-by-topic': self.get_tweets_by_topic
+            'get-last-update-topics': self.get_last_update_topics,
+            'get-most-post-topics': self.get_most_post_topics,
+            'get-get-tweets-by-topic': self.get_tweets_by_topic
         }
         router.get(url, self.redirect_404)()
 
-    @gen.coroutine
     def index_page(self):
-        log.info('index_page')
+        log.info('index_page from {}'.format(self.ip))
 
-        tweets = self.db.twitter.tweets
-        cursor = tweets.find({}, {'text': 1}).\
-            sort([{'timestamp', pymongo.DESCENDING}]).\
-            limit(self._default_n_tweets)
-        articles = []
+        try:
+            tweets = self.db.twitter.tweets
+            articles = []
 
-        while (yield cursor.fetch_next):
-            docu = cursor.next_object()
-            articles.append(docu['text'])
+            cursor = tweets.find({}, {'text': 1}).\
+                sort([{'timestamp', pymongo.DESCENDING}]).\
+                limit(self._default_n_tweets)
 
-        articles = '<p>' + '</p><p>'.join(articles) + '</p>'
+            while (yield cursor.fetch_next):
+                docu = cursor.next_object()
+                articles.append(docu['text'])
 
-        self.render('topic_tweets.html', articles=articles)
-        self.finish()
+            articles = '<p>' + '</p><p>'.join(articles) + '</p>'
+            self.render('topic_tweets.html', articles=articles)
+            self.finish()
+        except Exception as err:
+            log.error(err)
 
     @gen.coroutine
     def get_tweets_by_topic(self):
-        topic = str(self.get_argument('topic', strip=True))
-        tweets = self.db.twitter.tweets
-        articles = []
-        cursor = tweets.find({'topics': topic}, {'text': 1}).\
-            limit(self._default_n_tweets)
+        log.info('get_tweets_by_topic from {}'.format(self.ip))
 
-        while (yield cursor.fetch_next):
-            docu = cursor.next_object()
-            articles.append(docu['text'])
+        try:
+            topic = str(self.get_argument('topic', strip=True))
+            tweets = self.db.twitter.tweets
+            articles = []
+            cursor = tweets.find({'topics': topic}, {'text': 1}).\
+                limit(self._default_n_tweets)
 
-        articles = '<p>' + '</p><p>'.join(articles) + '</p>'
+            while (yield cursor.fetch_next):
+                docu = cursor.next_object()
+                articles.append(docu['text'])
 
-        self.write_json(data=articles)
-        self.finish()
+            articles = '<p>' + '</p><p>'.join(articles) + '</p>'
+
+            self.write_json(data=articles)
+            self.finish()
+        except Exception as err:
+            log.error(err)
 
     @gen.coroutine
     def get_last_update_topics(self):
         """
         {'topic': '', 'timestamp': ''}
         """
-        log.info('get_last_update_topics')
+        log.info('get_last_update_topics from {}'.format(self.ip))
 
-        n_topics = int(self.get_argument('n_topics', self._default_n_topics))
-        tweets = self.db.twitter.tweets
-        last_update_topics = []
-        topics = []
+        try:
+            n_topics = int(
+                self.get_argument('n_topics', self._default_n_topics)
+            )
+            tweets = self.db.twitter.tweets
+            last_update_topics = []
+            topics = []
 
-        cursor = tweets.find({'topics': {'$ne': []}},
-                             {'topics': 1, 'timestamp': 1}).\
-            sort([('timestamp', pymongo.DESCENDING)])
+            cursor = tweets.find({'topics': {'$ne': []}},
+                                 {'topics': 1, 'timestamp': 1}).\
+                sort([('timestamp', pymongo.DESCENDING)])
 
-        for docu in (yield cursor.to_list(length=n_topics * 2)):
-            for topic in docu['topics']:
-                if topic not in topics:
-                    topics.append(topic)
-                    last_update_topics.append(
-                        {'topic': topic, 'timestamp': str(docu['timestamp'])}
-                    )
+            for docu in (yield cursor.to_list(length=n_topics * 2)):
+                for topic in docu['topics']:
+                    if topic not in topics:
+                        topics.append(topic)
+                        last_update_topics.append(
+                            """<li title="{}">{}</li>"""
+                            .format(str(docu['timestamp']), topic)
+                        )
+
+                    if len(topics) >= n_topics:
+                        break
 
                 if len(topics) >= n_topics:
                     break
 
-            if len(topics) >= n_topics:
-                break
-
-        self.write_json(data=last_update_topics)
-        self.finish()
+            last_update_topics = ''.join(last_update_topics)
+            self.write_json(data=last_update_topics)
+            self.finish()
+        except Exception as err:
+            log.error(err)
 
     @gen.coroutine
     def get_most_post_topics(self):
-        log.info('get_most_post_topics')
+        log.info('get_most_post_topics from {}'.format(self.ip))
 
-        n_topics = int(self.get_argument('n_topics', self._default_n_topics))
-        statistics = self.db.twitter.statistics
-        most_post_topics = []
-
-        docu = yield statistics.find_one({'collection': 'tweets'})
-
-        topics = Counter(docu['topics_count']).most_common()[: n_topics]
-        for (topic, n) in topics:
-            most_post_topics.append(
-                {'topic': topic, 'count': n}
+        try:
+            n_topics = int(
+                self.get_argument('n_topics', self._default_n_topics)
             )
+            statistics = self.db.twitter.statistics
+            most_post_topics = []
 
-        self.write_json(data=most_post_topics)
-        self.finish()
+            docu = yield statistics.find_one({'collection': 'tweets'})
+
+            topics = Counter(docu['topics_count']).most_common()[: n_topics]
+            for (topic, n) in topics:
+                most_post_topics.append(
+                    """<li title="{count::2d}">{}</li>"""
+                    .format(n, topic)
+                )
+
+            self.write_json(data=most_post_topics)
+            self.finish()
+        except Exception as err:
+            log.error(err)

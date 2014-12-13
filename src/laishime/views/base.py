@@ -42,6 +42,10 @@ class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
     def db(self):
         return self.application.db
 
+    @property
+    def ip(self):
+        return self.request.headers.get('X-Real-IP', self.request.remote_ip)
+
     def write_json(self, *, status=OK, msg='', data={}):
         self.write(json.dumps({
             'status': status,
