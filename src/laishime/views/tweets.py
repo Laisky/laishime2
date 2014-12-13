@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import traceback
 import logging
 from collections import Counter
 
@@ -23,7 +24,7 @@ class TopicTweets(BaseHandler):
             'index.html': self.index_page,
             'get-last-update-topics': self.get_last_update_topics,
             'get-most-post-topics': self.get_most_post_topics,
-            'get-get-tweets-by-topic': self.get_tweets_by_topic
+            'get-tweets-by-topic': self.get_tweets_by_topic
         }
         router.get(url, self.redirect_404)()
 
@@ -44,9 +45,10 @@ class TopicTweets(BaseHandler):
 
             articles = '<p>' + '</p><p>'.join(articles) + '</p>'
             self.render('topic_tweets.html', articles=articles)
+        except:
+            log.error(traceback.format_exc)
+        finally:
             self.finish()
-        except Exception as err:
-            log.error(err)
 
     @gen.coroutine
     def get_tweets_by_topic(self):
@@ -66,9 +68,10 @@ class TopicTweets(BaseHandler):
             articles = '<p>' + '</p><p>'.join(articles) + '</p>'
 
             self.write_json(data=articles)
+        except:
+            log.error(traceback.format_exc)
+        finally:
             self.finish()
-        except Exception as err:
-            log.error(err)
 
     @gen.coroutine
     def get_last_update_topics(self):
@@ -106,9 +109,10 @@ class TopicTweets(BaseHandler):
 
             last_update_topics = ''.join(last_update_topics)
             self.write_json(data=last_update_topics)
+        except:
+            log.error(traceback.format_exc)
+        finally:
             self.finish()
-        except Exception as err:
-            log.error(err)
 
     @gen.coroutine
     def get_most_post_topics(self):
@@ -131,6 +135,7 @@ class TopicTweets(BaseHandler):
                 )
 
             self.write_json(data=most_post_topics)
+        except:
+            log.error(traceback.format_exc())
+        finally:
             self.finish()
-        except Exception as err:
-            log.error(err)
