@@ -156,7 +156,7 @@ class TopicTweets(BaseHandler):
                 'S6EDKLg7WmZsHVnGxBFFIA',
                 'oeDkQFBAhTioFNXurRB6UR7Np4N7AORpfuXvbho'
             )
-            max_stored_id = yield tweets.find_one(
+            last_stored_tweet = yield tweets.find_one(
                 sort=[('id', pymongo.DESCENDING)]
             )
             user_info = yield account.find_one({'id': uid})
@@ -167,10 +167,10 @@ class TopicTweets(BaseHandler):
             )
             api = API(auth)
             #TODO: block!!!
-            statuses = api.user_timeline(since_id=max_stored_id)
+            statuses = api.user_timeline(since_id=last_stored_tweet['id'])
 
             for status in statuses:
-                if status.id <= max_stored_id:
+                if status.id <= last_stored_tweet['id']:
                     continue
 
                 yield tweets.update({'id': status.id}, status, upsert=True)
