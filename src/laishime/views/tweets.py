@@ -7,6 +7,7 @@ from collections import Counter
 import pymongo
 from tornado import gen
 from tornado.web import asynchronous
+from tweepy import API, OAuthHandler
 
 from laishime.views import BaseHandler
 
@@ -20,17 +21,19 @@ class TopicTweets(BaseHandler):
 
     @asynchronous
     def get(self, url):
+        log.info('TopicTweets from {}'.format(self.ip))
         router = {
             'index.html': self.index_page,
             'get-last-update-topics': self.get_last_update_topics,
             'get-most-post-topics': self.get_most_post_topics,
-            'get-tweets-by-topic': self.get_tweets_by_topic
+            'get-tweets-by-topic': self.get_tweets_by_topic,
+            'crawler-tweets': self.crawler_tweets
         }
         router.get(url, self.redirect_404)()
 
     @gen.coroutine
     def index_page(self):
-        log.info('index_page from {}'.format(self.ip))
+        log.debug('index_page')
 
         try:
             tweets = self.db.twitter.tweets
@@ -53,7 +56,7 @@ class TopicTweets(BaseHandler):
 
     @gen.coroutine
     def get_tweets_by_topic(self):
-        log.info('get_tweets_by_topic from {}'.format(self.ip))
+        log.debug('get_tweets_by_topic')
 
         try:
             topic = str(self.get_argument('topic', strip=True))
@@ -79,7 +82,7 @@ class TopicTweets(BaseHandler):
         """
         {'topic': '', 'timestamp': ''}
         """
-        log.info('get_last_update_topics from {}'.format(self.ip))
+        log.debug('get_last_update_topics')
 
         try:
             n_topics = int(
@@ -117,7 +120,7 @@ class TopicTweets(BaseHandler):
 
     @gen.coroutine
     def get_most_post_topics(self):
-        log.info('get_most_post_topics from {}'.format(self.ip))
+        log.debug('get_most_post_topics')
 
         try:
             n_topics = int(
@@ -136,6 +139,41 @@ class TopicTweets(BaseHandler):
                 )
 
             self.write_json(data=most_post_topics)
+        except:
+            log.error(traceback.format_exc())
+        finally:
+            self.finish()
+
+    @gen.coroutine
+    def crawler_tweets(self):
+        log.debug('crawler_tweets')
+
+        try:
+            account = self.db.twitter.account
+            tweets = self.db.twitter.tweets
+            uid = 105351466
+            auth = OAuthHandler(
+                'S6EDKLg7WmZsHVnGxBFFIA',
+                'oeDkQFBAhTioFNXurRB6UR7Np4N7AORpfuXvbho'
+            )
+            max_stored_id = yield tweets.find_one(
+                sort=[('id', pymongo.DESCENDING)]
+            )
+            user_info = yield account.find_one({'id': uid})
+
+            auth.set_access_token(
+                user_info['access_token'],
+                user_info['access_token_secret']
+            )
+            api = API(auth)
+            #TODO: block!!!
+            statuses = api.user_timeline(since_id=max_stored_id)
+
+            for status in statuses:
+                if status.id <= max_stored_id:
+                    continue
+
+                yield tweets.update({'id': status.id}, status, upsert=True)
         except:
             log.error(traceback.format_exc())
         finally:
