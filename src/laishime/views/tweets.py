@@ -173,7 +173,9 @@ class TopicTweets(BaseHandler):
                 if status.id <= last_stored_tweet['id']:
                     continue
 
-                yield tweets.update({'id': status.id}, status, upsert=True)
+                yield tweets.update(
+                    {'id': status.id}, status._json, upsert=True
+                )
         except:
             log.error(traceback.format_exc())
         finally:
