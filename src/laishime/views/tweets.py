@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import traceback
+from datetime import datetime
 import logging
 from collections import Counter
 
@@ -170,11 +171,16 @@ class TopicTweets(BaseHandler):
             statuses = api.user_timeline(since_id=last_stored_tweet['id'])
 
             for status in statuses:
-                if status.id <= last_stored_tweet['id']:
+                tweet = status._json
+                if tweet['id'] <= last_stored_tweet['id']:
                     continue
 
+                tweet['created_at'] = datetime.strptime(
+                    tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'
+                )
+
                 yield tweets.update(
-                    {'id': status.id}, status._json, upsert=True
+                    {'id': tweets['id']}, tweet, upsert=True
                 )
         except:
             log.error(traceback.format_exc())
