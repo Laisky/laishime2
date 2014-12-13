@@ -22,6 +22,8 @@ log = logging.getLogger('Application')
 define('config', default=os.path.join(PWD, 'config', 'server.conf'))
 define('port', default=27800, type=int)
 define('debug', default=False, type=bool)
+define('dbhost', default='127.0.0.1', type=str)
+define('dbport', default=27017, type=int)
 
 
 class PageNotFound(BaseHandler):
@@ -40,6 +42,7 @@ class Application(tornado.wsgi.WSGIApplication):
             'login_url': '/login/',
             'xsrf_cookies': True,
             'autoescape': None,
+            'debug': options.debug
         }
         handlers = [
             # -------------- handler --------------
@@ -51,12 +54,10 @@ class Application(tornado.wsgi.WSGIApplication):
         self.setup_db()
 
     def setup_db(self):
-        if options.debug:
-            log.debug('start application in debug')
-            self.db = MotorClient(host='128.199.219.106')
-        else:
-            log.debug('start application in normal')
-            self.db = MotorClient()
+        log.debug('connect dabase at {}:{}'
+                  .format(options.dbhost, options.dbport))
+
+        self.db = MotorClient(host=options.dbhost, port=options.dbport)
 
 
 application = sae.create_wsgi_app(Application())

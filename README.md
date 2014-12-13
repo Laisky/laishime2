@@ -14,7 +14,7 @@ $ cd laishime2/src
 $ python3 -m venv .
 $ source bin/activate
 $ bin/python setup.py develop
-$ bin/python -m laishime
+$ bin/python -m laishime [--debug=false] [--dbhost=127.0.0.1] [--dbport=27017]
 ```
 
 Supervisor 和 Nginx 的配置文件在 `laishime/1/deploy` 中
