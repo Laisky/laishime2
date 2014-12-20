@@ -18,7 +18,7 @@ from .views import BaseHandler, TopicTweets
 
 
 # logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger('Application')
+log = logging.getLogger(__name__)
 define('config', default=os.path.join(PWD, 'config', 'server.conf'))
 define('port', default=27800, type=int)
 define('debug', default=False, type=bool)

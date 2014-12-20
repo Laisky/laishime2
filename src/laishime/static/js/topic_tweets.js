@@ -1,7 +1,24 @@
 $(function(){
     get_last_update_topics();
     get_most_post_topics();
+
+    $("ul.topics").children().bind("click", function(){
+        var topic = arguments[0].target.innerText;
+        get_tweets_by_topic(topic);
+    });
 });
+
+
+function get_tweets_by_topic(topic){
+    var url = "get-tweets-by-topic";
+    var data = {"topic": topic};
+
+    $.getJSON(url, data, function(data){
+        if(data.status != 1) return;
+
+        $("#tweets").html(data.data);
+    });
+}
 
 
 function get_last_update_topics(){

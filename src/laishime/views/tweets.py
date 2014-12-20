@@ -178,7 +178,9 @@ class TopicTweets(BaseHandler):
                 if tweet['id'] <= last_stored_tweet['id']:
                     continue
 
-                tweet['topics'] = reg_topic.findall(tweet['text'])
+                tweet['topics'] = reg_topic.findall(
+                    tweet['text'].replace('.', '_')
+                )
                 tweet['created_at'] = datetime.strptime(
                     tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'
                 )
