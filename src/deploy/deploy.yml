@@ -1,0 +1,7 @@
+---
+- name: Deploy Laishime2
+  hosts: localhost
+  user: laisky
+
+  roles:
+    - ubuntu

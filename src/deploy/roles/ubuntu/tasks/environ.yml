@@ -1,0 +1,27 @@
+---
+# compile nodejs environ
+- name: environ
+  sudo: False
+  apt: name={{item}} state=latest update_cache=True
+  with_items:
+    - make
+    - gcc
+    - g++
+    - automake
+    - autoconf
+    - build-essential
+    - libtool
+    - libcurl4-gnutls-dev
+    - libexpat1-dev
+    - gettext
+    - libz-dev
+    - libssl-dev
+    - openssl
+    - gfortran
+    - libopenblas-dev
+    - liblapack-dev
+    - python-dev
+    - libsqlite3-dev
+    - libbz2-dev
+
+
