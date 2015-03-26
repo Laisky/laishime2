@@ -7,17 +7,25 @@ import tornado.options as opt
 from tornado.options import options
 
 from . import Application
+from .const import LOG_NAME
 
 
-log = logging.getLogger(__name__)
-opt.parse_config_file(options.config)
-opt.parse_command_line()
+log = logging.getLogger(LOG_NAME)
 
-http_server = tornado.httpserver.HTTPServer(Application())
-http_server.listen(options.port)
 
-if options.debug:
-    log.info('start application in debug mode')
-else:
-    log.info('start application in normal mode')
-tornado.ioloop.IOLoop.instance().start()
+def main():
+    opt.parse_config_file(options.config)
+    opt.parse_command_line()
+
+    http_server = tornado.httpserver.HTTPServer(Application())
+    http_server.listen(options.port)
+
+    if options.debug:
+        log.info('start application in debug mode')
+    else:
+        log.info('start application in normal mode')
+    tornado.ioloop.IOLoop.instance().start()
+
+
+if __name__ == '__main__':
+    main()
