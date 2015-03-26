@@ -23,7 +23,7 @@ define('config', default=os.path.join(PWD, 'config', 'server.conf'))
 define('port', default=27800, type=int)
 define('debug', default=False, type=bool)
 define('dbhost', default='127.0.0.1', type=str)
-define('dbport', default=27017, type=int)
+define('dbport', default=27016, type=int)
 
 
 class PageNotFound(BaseHandler):
