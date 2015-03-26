@@ -13,17 +13,20 @@ try:
 except ImportError:
     from .tests import sae
 
-from .const import PWD
-from .views import BaseHandler, TopicTweets
+from .const import PWD, SERVER_PORT, DB_HOST, DB_PORT, LOG_NAME
+from .views import TopicTweets
+from .utils import setup_log, BaseHandler
 
 
-# logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger(__name__)
 define('config', default=os.path.join(PWD, 'config', 'server.conf'))
-define('port', default=27800, type=int)
+define('port', default=SERVER_PORT, type=int)
 define('debug', default=False, type=bool)
-define('dbhost', default='127.0.0.1', type=str)
-define('dbport', default=27017, type=int)
+define('dbhost', default=DB_HOST, type=str)
+define('dbport', default=DB_PORT, type=int)
+setup_log()
+
+
+log = logging.getLogger(LOG_NAME)
 
 
 class PageNotFound(BaseHandler):

@@ -11,10 +11,11 @@ from tornado import gen
 from tornado.web import asynchronous
 from tweepy import API, OAuthHandler
 
-from laishime.views import BaseHandler
+from ..utils import BaseHandler
+from ..const import LOG_NAME
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger(LOG_NAME)
 
 
 class TopicTweets(BaseHandler):
@@ -151,7 +152,7 @@ class TopicTweets(BaseHandler):
         log.debug('crawler_tweets')
 
         try:
-            #TODO modularity!
+            # TODO modularity!
             account = self.db.twitter.account
             tweets = self.db.twitter.tweets
             uid = 105351466
@@ -170,7 +171,7 @@ class TopicTweets(BaseHandler):
                 user_info['access_token_secret']
             )
             api = API(auth)
-            #TODO: block!!!
+            # TODO: block!!!
             statuses = api.user_timeline(since_id=last_stored_tweet['id'])
 
             for status in statuses:
