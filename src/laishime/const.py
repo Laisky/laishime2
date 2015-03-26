@@ -16,4 +16,4 @@ DB_HOST = '127.0.0.1'
 DB_PORT = 27016
 
 # test
-DB_HOST = 'laisky.com'
+# DB_HOST = 'laisky.com'

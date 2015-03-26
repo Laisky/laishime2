@@ -13,6 +13,7 @@ from tweepy import API, OAuthHandler
 
 from ..utils import BaseHandler
 from ..const import LOG_NAME
+from ..status import ERROR
 
 
 log = logging.getLogger(LOG_NAME)
@@ -174,6 +175,7 @@ class TopicTweets(BaseHandler):
             # TODO: block!!!
             statuses = api.user_timeline(since_id=last_stored_tweet['id'])
 
+            count = 0
             for status in statuses:
                 tweet = status._json
                 if tweet['id'] <= last_stored_tweet['id']:
@@ -189,8 +191,13 @@ class TopicTweets(BaseHandler):
                 yield tweets.update(
                     {'id': tweet['id']}, {'$set': tweet}, upsert=True
                 )
+                count += 1
                 log.debug('updated {}'.format(tweet['id']))
+
+            self.write_json(data='success crawl {} tweets'.format(count))
         except:
-            log.error(traceback.format_exc())
+            err = traceback.format_exc()
+            log.error(err)
+            self.write_json(msg=err, status=ERROR)
         finally:
             self.finish()
