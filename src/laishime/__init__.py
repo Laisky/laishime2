@@ -8,11 +8,6 @@ import tornado.wsgi
 import tornado.web
 from tornado.options import define, options
 
-try:
-    import sae
-except ImportError:
-    from .tests import sae
-
 from .const import PWD, SERVER_PORT, DB_HOST, DB_PORT, LOG_NAME
 from .views import TopicTweets
 from .utils import setup_log, BaseHandler
@@ -61,6 +56,3 @@ class Application(tornado.wsgi.WSGIApplication):
                   .format(options.dbhost, options.dbport))
 
         self.db = MotorClient(host=options.dbhost, port=options.dbport)
-
-
-application = sae.create_wsgi_app(Application())
