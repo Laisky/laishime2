@@ -8,16 +8,16 @@ import tornado.wsgi
 import tornado.web
 from tornado.options import define, options
 
-from .const import PWD, SERVER_PORT, DB_HOST, DB_PORT, LOG_NAME
+from .const import CWD, LOG_NAME
 from .views import TopicTweets
 from .utils import setup_log, BaseHandler
 
 
-define('config', default=os.path.join(PWD, 'config', 'server.conf'))
-define('port', default=SERVER_PORT, type=int)
+define('config', default=os.path.join(CWD, 'config', 'server.conf'))
+define('port', type=int)
 define('debug', default=False, type=bool)
-define('dbhost', default=DB_HOST, type=str)
-define('dbport', default=DB_PORT, type=int)
+define('dbhost', type=str)
+define('dbport', type=int)
 setup_log()
 
 
@@ -33,9 +33,9 @@ class PageNotFound(BaseHandler):
 class Application(tornado.wsgi.WSGIApplication):
     def __init__(self):
         settings = {
-            'static_path': os.path.join(PWD, 'static'),
+            'static_path': os.path.join(CWD, 'static'),
             'static_url_prefix': '/static/',
-            'template_path': os.path.join(PWD, 'static', 'templates'),
+            'template_path': os.path.join(CWD, 'static', 'templates'),
             'cookie_secret': 'XmuwPAt8wHdnik4Xvc3GXmbXLifVmPZYhoc9Tx4x1iZ',
             'login_url': '/login/',
             'xsrf_cookies': True,
