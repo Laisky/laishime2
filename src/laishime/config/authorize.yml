@@ -1,5 +1,0 @@
----
-twitter:
-    CONSUMER_KEY: S6EDKLg7WmZsHVnGxBFFIA
-    CONSUMER_SECRET: oeDkQFBAhTioFNXurRB6UR7Np4N7AORpfuXvbho
-    CALLBACK_URL: http://hime.laisky.us/api/authorize?source=twitter

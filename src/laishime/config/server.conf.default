@@ -1,9 +1,13 @@
 # should be options.define first
 # ------------- server -------------
-port = 27800
+port = YOUR_SERVER_PORT
+
+# ------------- db -------------
+dbhost = YOUR_DB_HOST
+dbport = YOUT_DB_PORT
 
 # ------------- logging -------------
 logging = "debug"
 # log_to_stderr = True
-# log_file_prefix = "/var/log/tornado.log"
+# log_file_prefix = "/tmp/laishime2.log"
 # log_file_num_backups = 2
