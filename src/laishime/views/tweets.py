@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re
 import traceback
-from datetime import datetime
 import logging
 from collections import Counter
 
@@ -11,7 +9,7 @@ from tornado import gen
 from tornado.web import asynchronous
 from tweepy import API, OAuthHandler
 
-from ..utils import BaseHandler
+from ..utils import BaseHandler, twitter_api_parser
 from ..const import LOG_NAME
 from ..status import ERROR
 
@@ -157,7 +155,6 @@ class TopicTweets(BaseHandler):
             account = self.db.twitter.account
             tweets = self.db.twitter.tweets
             uid = 105351466
-            reg_topic = re.compile(r"[\b|\s]#(\S+)")
             auth = OAuthHandler(
                 'S6EDKLg7WmZsHVnGxBFFIA',
                 'oeDkQFBAhTioFNXurRB6UR7Np4N7AORpfuXvbho'
@@ -181,13 +178,7 @@ class TopicTweets(BaseHandler):
                 if tweet['id'] <= last_stored_tweet['id']:
                     continue
 
-                tweet['topics'] = reg_topic.findall(
-                    tweet['text'].replace('.', '_')
-                )
-                tweet['created_at'] = datetime.strptime(
-                    tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'
-                )
-
+                tweet = twitter_api_parser(tweet)
                 yield tweets.update(
                     {'id': tweet['id']}, {'$set': tweet}, upsert=True
                 )

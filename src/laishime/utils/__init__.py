@@ -5,11 +5,13 @@ import logging
 from multiprocessing.pool import ThreadPool
 
 from ..const import LOG_NAME, LOG_LEVEL, LOG_PATH
-from .tornado import BaseHandler
+from .tornado import BaseHandler, BackgroundMixin
+from .parser import twitter_api_parser
 
 
 __all__ = ['BaseHandler',
-           'setup_log', 'BackgroundMixin']
+           'setup_log', 'BackgroundMixin',
+           'twitter_api_parser']
 
 
 log = logging.getLogger(LOG_NAME)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import re
+import datetime
 import logging
 
 from ..const import LOG_NAME
@@ -9,6 +10,39 @@ from ..exception import LaishimeNotCompleted
 
 log = logging.getLogger(LOG_NAME)
 twitter_surl_regex = re.compile('https?://t\.co/[A-z0-9]*')
+
+
+def twitter_api_parser(tweet):
+    reg_topic = re.compile(r"[\b|\s]#(\S+)")
+    tweet['topics'] = reg_topic.findall(
+        tweet['text'].replace('.', '_')
+    )
+    tweet['created_at'] = datetime.datetime.strptime(
+        tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y'
+    )
+
+    # replace url
+    t = tweet['text']
+    if 't.co' in t:
+        continue
+
+        # parse entities media
+        if 'media' in tweet['entities']:
+            for media in tweet['entities']['media']:
+                surl = media['url']
+                eurl = media['media_url']
+                t = t.replace(surl, eurl)
+
+        # parse entities urls
+        if 'urls' in tweet['entities']:
+            for d in tweet['entities']['urls']:
+                surl = d['url']
+                eurl = d['expanded_url']
+                t = t.replace(surl, eurl)
+
+        tweet['text'] = t
+
+    return tweet
 
 
 def twitter_history_parser(tweet):

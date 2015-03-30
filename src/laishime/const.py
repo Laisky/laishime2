@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import re
 import logging
 
 import yaml
@@ -18,7 +19,7 @@ AUTHORIZE = yaml.load(open(os.path.join(CWD, 'config/authorize.yml')))
 TWITTER_AUTH = AUTHORIZE['twitter']
 
 # regex
-url_regex = (
+url_regex = re.compile(
     r"(?xi)"
     "\b"
     "("                                     # Capture 1: entire matched URL
