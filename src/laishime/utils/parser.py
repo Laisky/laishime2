@@ -24,8 +24,6 @@ def twitter_api_parser(tweet):
     # replace url
     t = tweet['text']
     if 't.co' in t:
-        continue
-
         # parse entities media
         if 'media' in tweet['entities']:
             for media in tweet['entities']['media']:
@@ -76,7 +74,6 @@ def twitter_history_parser(tweet):
         if len(eurls) != len(surls):
             err = 'length of expanded_urls not equal to short_urls'
             log.error('{} for tweet id {}'.format(err, tweet['_id']))
-            break
 
     for i, surl in enumerate(surls):
         ul = len(surl)
