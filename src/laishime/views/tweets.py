@@ -10,7 +10,7 @@ from tornado.web import asynchronous
 from tweepy import API, OAuthHandler
 
 from ..utils import BaseHandler, twitter_api_parser
-from ..const import LOG_NAME
+from ..const import LOG_NAME, url_regex
 from ..status import ERROR
 
 
@@ -47,6 +47,7 @@ class TopicTweets(BaseHandler):
 
             while (yield cursor.fetch_next):
                 docu = cursor.next_object()
+                docu['text'] = self._render_url(docu['text'])
                 articles.append(docu['text'])
 
             articles = '<p>' + '</p><p>'.join(articles) + '</p>'
@@ -55,6 +56,17 @@ class TopicTweets(BaseHandler):
             log.error(traceback.format_exc())
         finally:
             self.finish()
+
+    def _render_url(self, text):
+
+        for url in url_regex.findall(text):
+            url = ''.join([u for u in url if u])
+            url_link = '<a href="{url}" target="_blank">{url}</a>'.\
+                format(url=url)
+            log.debug('replace url from {} to {}'.format(url, url_link))
+            text = text.replace(url, url_link)
+
+        return text
 
     @gen.coroutine
     def get_tweets_by_topic(self):
@@ -69,6 +81,7 @@ class TopicTweets(BaseHandler):
 
             while (yield cursor.fetch_next):
                 docu = cursor.next_object()
+                docu['text'] = self._render_url(docu['text'])
                 articles.append(docu['text'])
 
             articles = '<p>' + '</p><p>'.join(articles) + '</p>'
