@@ -76,8 +76,9 @@ class TopicTweets(BaseHandler):
             topic = str(self.get_argument('topic', strip=True))
             tweets = self.db.twitter.tweets
             articles = []
-            cursor = tweets.find({'topics': topic}, {'text': 1}).\
-                limit(self._default_n_tweets)
+            cursor = tweets.find({'topics': topic}, {'text': 1}) \
+                .sort([('created_at', pymongo.DESCENDING)]) \
+                .limit(self._default_n_tweets)
 
             while (yield cursor.fetch_next):
                 docu = cursor.next_object()
