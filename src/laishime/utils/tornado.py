@@ -4,6 +4,7 @@ import os
 import json
 import logging
 import contextlib
+import traceback
 
 import tornado
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
@@ -13,6 +14,16 @@ from ..const import LOG_NAME
 
 
 log = logging.getLogger(LOG_NAME)
+
+
+def debug_wrapper(func):
+    def wrapper(*args, **kw):
+        try:
+            yield from func(*args, **kw)
+        except Exception:
+            log.error(traceback.format_exc())
+            raise
+    return wrapper
 
 
 class TemplateRendering():

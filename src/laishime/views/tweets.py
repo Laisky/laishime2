@@ -5,11 +5,11 @@ import logging
 from collections import Counter
 
 import pymongo
-from tornado import gen
+import tornado
 from tornado.web import asynchronous
 from tweepy import API, OAuthHandler
 
-from ..utils import BaseHandler, twitter_api_parser
+from ..utils import BaseHandler, twitter_api_parser, debug_wrapper
 from ..const import LOG_NAME, url_regex, TWITTER_AUTH
 from ..status import ERROR
 
@@ -33,7 +33,7 @@ class TopicTweets(BaseHandler):
         }
         router.get(url, self.redirect_404)()
 
-    @gen.coroutine
+    @tornado.gen.coroutine
     def index_page(self):
         log.debug('index_page')
 
@@ -68,99 +68,90 @@ class TopicTweets(BaseHandler):
 
         return text
 
-    @gen.coroutine
+    @tornado.gen.coroutine
+    @debug_wrapper
     def get_tweets_by_topic(self):
         log.debug('get_tweets_by_topic')
 
-        try:
-            topic = str(self.get_argument('topic', strip=True))
-            tweets = self.db.twitter.tweets
-            articles = []
-            cursor = tweets.find({'topics': topic}, {'text': 1}) \
-                .sort([('created_at', pymongo.DESCENDING)]) \
-                .limit(self._default_n_tweets)
+        topic = str(self.get_argument('topic', strip=True))
+        tweets = self.db.twitter.tweets
+        articles = []
+        cursor = tweets.find({'topics': topic}, {'text': 1}) \
+            .sort([('created_at', pymongo.DESCENDING)]) \
+            .limit(self._default_n_tweets)
 
-            while (yield cursor.fetch_next):
-                docu = cursor.next_object()
-                docu['text'] = self._render_url(docu['text'])
-                articles.append(docu['text'])
+        while (yield cursor.fetch_next):
+            docu = cursor.next_object()
+            docu['text'] = self._render_url(docu['text'])
+            articles.append(docu['text'])
 
-            articles = '<p>' + '</p><p>'.join(articles) + '</p>'
+        articles = '<p>' + '</p><p>'.join(articles) + '</p>'
 
-            self.write_json(data=articles)
-        except:
-            log.error(traceback.format_exc())
-        finally:
-            self.finish()
+        self.write_json(data=articles)
+        self.finish()
 
-    @gen.coroutine
+    @tornado.gen.coroutine
+    @debug_wrapper
     def get_last_update_topics(self):
         """
         {'topic': '', 'created_at': ''}
         """
         log.debug('get_last_update_topics')
 
-        try:
-            n_topics = int(
-                self.get_argument('n_topics', self._default_n_topics)
-            )
-            tweets = self.db.twitter.tweets
-            last_update_topics = []
-            topics = []
+        n_topics = int(
+            self.get_argument('n_topics', self._default_n_topics)
+        )
+        tweets = self.db.twitter.tweets
+        last_update_topics = []
+        topics = []
 
-            cursor = tweets.find({'topics': {'$ne': []}},
-                                 {'topics': 1, 'created_at': 1}).\
-                sort([('created_at', pymongo.DESCENDING)])
+        cursor = tweets.find({'topics': {'$ne': []}},
+                             {'topics': 1, 'created_at': 1}).\
+            sort([('created_at', pymongo.DESCENDING)])
 
-            for docu in (yield cursor.to_list(length=n_topics * 2)):
-                for topic in docu['topics']:
-                    if topic not in topics:
-                        topics.append(topic)
-                        last_update_topics.append(
-                            """<li title="{}">{}</li>"""
-                            .format(str(docu['created_at']), topic)
-                        )
-
-                    if len(topics) >= n_topics:
-                        break
+        for docu in (yield cursor.to_list(length=n_topics * 2)):
+            for topic in docu['topics']:
+                if topic not in topics:
+                    topics.append(topic)
+                    last_update_topics.append(
+                        """<li title="{}">{}</li>"""
+                        .format(str(docu['created_at']), topic)
+                    )
 
                 if len(topics) >= n_topics:
                     break
 
-            last_update_topics = ''.join(last_update_topics)
-            self.write_json(data=last_update_topics)
-        except:
-            log.error(traceback.format_exc())
-        finally:
-            self.finish()
+            if len(topics) >= n_topics:
+                break
 
-    @gen.coroutine
+        last_update_topics = ''.join(last_update_topics)
+        self.write_json(data=last_update_topics)
+        self.finish()
+
+    @tornado.gen.coroutine
+    @debug_wrapper
     def get_most_post_topics(self):
         log.debug('get_most_post_topics')
 
-        try:
-            n_topics = int(
-                self.get_argument('n_topics', self._default_n_topics)
+        n_topics = int(
+            self.get_argument('n_topics', self._default_n_topics)
+        )
+        statistics = self.db.twitter.statistics
+        most_post_topics = []
+
+        docu = yield statistics.find_one({'collection': 'tweets'})
+
+        topics = Counter(docu['topics_count']).most_common()[: n_topics]
+        for (topic, n) in topics:
+            most_post_topics.append(
+                """<li title="{:2d}">{}</li>"""
+                .format(n, topic)
             )
-            statistics = self.db.twitter.statistics
-            most_post_topics = []
 
-            docu = yield statistics.find_one({'collection': 'tweets'})
+        self.write_json(data=most_post_topics)
+        self.finish()
 
-            topics = Counter(docu['topics_count']).most_common()[: n_topics]
-            for (topic, n) in topics:
-                most_post_topics.append(
-                    """<li title="{:2d}">{}</li>"""
-                    .format(n, topic)
-                )
-
-            self.write_json(data=most_post_topics)
-        except:
-            log.error(traceback.format_exc())
-        finally:
-            self.finish()
-
-    @gen.coroutine
+    @tornado.gen.coroutine
     def crawler_tweets(self):
         log.debug('crawler_tweets')
 
