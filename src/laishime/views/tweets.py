@@ -171,6 +171,7 @@ class TopicTweets(BaseHandler):
             'topics_count': topics
         }
         self.write_json(data=docu)
+        self.finish()
 
     @tornado.gen.coroutine
     def crawler_tweets(self):
