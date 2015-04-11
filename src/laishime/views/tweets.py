@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import traceback
 import logging
-from collections import Counter
+from collections import Counter, defaultdict
 
 import pymongo
 import tornado
@@ -159,7 +159,7 @@ class TopicTweets(BaseHandler):
 
         cursor = self.db.twitter.tweets.find({'topics': {'$ne': []}}) \
             .max_time_ms(None)
-        topics = {}
+        topics = defaultdict(0)
 
         while (yield cursor.fetch_next):
             docu = cursor.next_object()
