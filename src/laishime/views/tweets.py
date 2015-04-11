@@ -159,7 +159,7 @@ class TopicTweets(BaseHandler):
 
         cursor = self.db.twitter.tweets.find({'topics': {'$ne': []}}) \
             .max_time_ms(None)
-        topics = defaultdict(0)
+        topics = defaultdict(int)
 
         while (yield cursor.fetch_next):
             docu = cursor.next_object()
