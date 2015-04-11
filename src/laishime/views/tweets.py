@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import traceback
 import logging
+import datetime
 from collections import Counter, defaultdict
 
 import pymongo
@@ -168,7 +169,8 @@ class TopicTweets(BaseHandler):
 
         docu = {
             'collection': 'tweets',
-            'topics_count': topics
+            'topics_count': topics,
+            'update_at': datetime.datetime.utcnow()
         }
         yield self.db.twitter.statistics.update(
             {'collection': docu['collection']},
