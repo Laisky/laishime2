@@ -96,27 +96,27 @@ class TopicTweets(BaseHandler):
         """
         {'topic': '', 'created_at': ''}
         """
-        log.debug('get_last_update_topics')
-
         n_topics = int(
             self.get_argument('n_topics', self._default_n_topics)
         )
+        log.debug('get_last_update_topics for n_topics {}'.format(n_topics))
+
         tweets = self.db.twitter.tweets
         last_update_topics = []
-        topics = []
+        topics = set()
 
         cursor = tweets.find({'topics': {'$ne': []}},
                              {'topics': 1, 'created_at': 1}).\
             sort([('created_at', pymongo.DESCENDING)])
 
-        for docu in (yield cursor.to_list(length=n_topics * 2)):
-            for topic in docu['topics']:
-                if topic not in topics:
-                    topics.append(topic)
-                    last_update_topics.append(
-                        """<li title="{}">{}</li>"""
-                        .format(str(docu['created_at']), topic)
-                    )
+        while (yield cursor.fetch_next):
+            docu = cursor.next_object()
+            for topic in set(docu['topics']) - topics:
+                topics.add(topic)
+                last_update_topics.append(
+                    """<li title="{}">{}</li>"""
+                    .format(str(docu['created_at']), topic)
+                )
 
                 if len(topics) >= n_topics:
                     break
