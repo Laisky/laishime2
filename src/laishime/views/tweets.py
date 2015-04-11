@@ -176,7 +176,7 @@ class TopicTweets(BaseHandler):
             {'collection': docu['collection']},
             {'$set': docu}
         )
-        self.write_json(data=docu)
+        self.write_json(msg='updated ok')
         self.finish()
 
     @tornado.gen.coroutine
