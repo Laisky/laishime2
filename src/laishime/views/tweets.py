@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import traceback
 import logging
-from collections import Counter
+import datetime
+from collections import Counter, defaultdict
 
 import pymongo
 import tornado
@@ -29,7 +30,8 @@ class TopicTweets(BaseHandler):
             'get-last-update-topics': self.get_last_update_topics,
             'get-most-post-topics': self.get_most_post_topics,
             'get-tweets-by-topic': self.get_tweets_by_topic,
-            'crawler-tweets': self.crawler_tweets
+            'crawler-tweets': self.crawler_tweets,
+            'update-statistics': self.update_statistics
         }
         router.get(url, self.redirect_404)()
 
@@ -71,9 +73,9 @@ class TopicTweets(BaseHandler):
     @tornado.gen.coroutine
     @debug_wrapper
     def get_tweets_by_topic(self):
-        log.debug('get_tweets_by_topic')
-
         topic = str(self.get_argument('topic', strip=True))
+        log.debug('get_tweets_by_topic for topic {}'.format(topic))
+
         tweets = self.db.twitter.tweets
         articles = []
         cursor = tweets.find({'topics': topic}, {'text': 1}) \
@@ -96,27 +98,27 @@ class TopicTweets(BaseHandler):
         """
         {'topic': '', 'created_at': ''}
         """
-        log.debug('get_last_update_topics')
-
         n_topics = int(
             self.get_argument('n_topics', self._default_n_topics)
         )
+        log.debug('get_last_update_topics for n_topics {}'.format(n_topics))
+
         tweets = self.db.twitter.tweets
         last_update_topics = []
-        topics = []
+        topics = set()
 
         cursor = tweets.find({'topics': {'$ne': []}},
                              {'topics': 1, 'created_at': 1}).\
             sort([('created_at', pymongo.DESCENDING)])
 
-        for docu in (yield cursor.to_list(length=n_topics * 2)):
-            for topic in docu['topics']:
-                if topic not in topics:
-                    topics.append(topic)
-                    last_update_topics.append(
-                        """<li title="{}">{}</li>"""
-                        .format(str(docu['created_at']), topic)
-                    )
+        while (yield cursor.fetch_next):
+            docu = cursor.next_object()
+            for topic in set(docu['topics']) - topics:
+                topics.add(topic)
+                last_update_topics.append(
+                    """<li title="{}">{}</li>"""
+                    .format(str(docu['created_at']), topic)
+                )
 
                 if len(topics) >= n_topics:
                     break
@@ -131,11 +133,11 @@ class TopicTweets(BaseHandler):
     @tornado.gen.coroutine
     @debug_wrapper
     def get_most_post_topics(self):
-        log.debug('get_most_post_topics')
-
         n_topics = int(
             self.get_argument('n_topics', self._default_n_topics)
         )
+        log.debug('get_most_post_topics for n_topics {}'.format(n_topics))
+
         statistics = self.db.twitter.statistics
         most_post_topics = []
 
@@ -149,6 +151,32 @@ class TopicTweets(BaseHandler):
             )
 
         self.write_json(data=most_post_topics)
+        self.finish()
+
+    @tornado.gen.coroutine
+    @debug_wrapper
+    def update_statistics(self):
+        log.debug('update_statistics')
+
+        cursor = self.db.twitter.tweets.find({'topics': {'$ne': []}}) \
+            .max_time_ms(None)
+        topics = defaultdict(int)
+
+        while (yield cursor.fetch_next):
+            docu = cursor.next_object()
+            for topic in docu['topics']:
+                topics[topic] += 1
+
+        docu = {
+            'collection': 'tweets',
+            'topics_count': topics,
+            'update_at': datetime.datetime.utcnow()
+        }
+        yield self.db.twitter.statistics.update(
+            {'collection': docu['collection']},
+            {'$set': docu}
+        )
+        self.write_json(msg='updated ok')
         self.finish()
 
     @tornado.gen.coroutine
