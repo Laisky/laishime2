@@ -30,7 +30,7 @@ class TopicTweets(BaseHandler):
             'get-most-post-topics': self.get_most_post_topics,
             'get-tweets-by-topic': self.get_tweets_by_topic,
             'crawler-tweets': self.crawler_tweets,
-            'update-statistic': self.update_statistic
+            'update-statistics': self.update_statistics
         }
         router.get(url, self.redirect_404)()
 
@@ -154,8 +154,8 @@ class TopicTweets(BaseHandler):
 
     @tornado.gen.coroutine
     @debug_wrapper
-    def update_statistic(self):
-        log.debug('update_statistic')
+    def update_statistics(self):
+        log.debug('update_statistics')
 
         cursor = self.db.twitter.tweets.find({'topics': {'$ne': []}}) \
             .max_time_ms(None)
@@ -170,6 +170,10 @@ class TopicTweets(BaseHandler):
             'collection': 'tweets',
             'topics_count': topics
         }
+        yield self.db.twitter.statistics.update(
+            {'collection': docu['collection']},
+            {'$set': docu}
+        )
         self.write_json(data=docu)
         self.finish()
 
