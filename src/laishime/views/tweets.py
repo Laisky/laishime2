@@ -10,7 +10,7 @@ from tornado.web import asynchronous
 from tweepy import API, OAuthHandler
 
 from ..utils import BaseHandler, twitter_api_parser
-from ..const import LOG_NAME, url_regex
+from ..const import LOG_NAME, url_regex, TWITTER_AUTH
 from ..status import ERROR
 
 
@@ -170,8 +170,8 @@ class TopicTweets(BaseHandler):
             tweets = self.db.twitter.tweets
             uid = 105351466
             auth = OAuthHandler(
-                'S6EDKLg7WmZsHVnGxBFFIA',
-                'oeDkQFBAhTioFNXurRB6UR7Np4N7AORpfuXvbho'
+                TWITTER_AUTH['CONSUMER_KEY'],
+                TWITTER_AUTH['CONSUMER_SECRET']
             )
             last_stored_tweet = yield tweets.find_one(
                 sort=[('id', pymongo.DESCENDING)]
