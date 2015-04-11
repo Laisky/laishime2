@@ -29,7 +29,8 @@ class TopicTweets(BaseHandler):
             'get-last-update-topics': self.get_last_update_topics,
             'get-most-post-topics': self.get_most_post_topics,
             'get-tweets-by-topic': self.get_tweets_by_topic,
-            'crawler-tweets': self.crawler_tweets
+            'crawler-tweets': self.crawler_tweets,
+            'update-statistic': self.update_statistic
         }
         router.get(url, self.redirect_404)()
 
@@ -71,9 +72,9 @@ class TopicTweets(BaseHandler):
     @tornado.gen.coroutine
     @debug_wrapper
     def get_tweets_by_topic(self):
-        log.debug('get_tweets_by_topic')
-
         topic = str(self.get_argument('topic', strip=True))
+        log.debug('get_tweets_by_topic for topic {}'.format(topic))
+
         tweets = self.db.twitter.tweets
         articles = []
         cursor = tweets.find({'topics': topic}, {'text': 1}) \
@@ -131,11 +132,11 @@ class TopicTweets(BaseHandler):
     @tornado.gen.coroutine
     @debug_wrapper
     def get_most_post_topics(self):
-        log.debug('get_most_post_topics')
-
         n_topics = int(
             self.get_argument('n_topics', self._default_n_topics)
         )
+        log.debug('get_most_post_topics for n_topics {}'.format(n_topics))
+
         statistics = self.db.twitter.statistics
         most_post_topics = []
 
@@ -150,6 +151,26 @@ class TopicTweets(BaseHandler):
 
         self.write_json(data=most_post_topics)
         self.finish()
+
+    @tornado.gen.coroutine
+    @debug_wrapper
+    def update_statistic(self):
+        log.debug('update_statistic')
+
+        cursor = self.db.twitter.tweets.find({'topics': {'$ne': []}}) \
+            .max_time_ms(None)
+        topics = {}
+
+        while (yield cursor.fetch_next):
+            docu = cursor.next_object()
+            for topic in docu['topics']:
+                topics[topic] += 1
+
+        docu = {
+            'collection': 'tweets',
+            'topics_count': topics
+        }
+        self.write_json(data=docu)
 
     @tornado.gen.coroutine
     def crawler_tweets(self):
