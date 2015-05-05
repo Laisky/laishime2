@@ -19,8 +19,8 @@ log = logging.getLogger(LOG_NAME)
 
 
 class TopicTweets(BaseHandler):
-    _default_n_tweets = 50
-    _default_n_topics = 5
+    _default_n_tweets = 100
+    _default_n_topics = 8
 
     @asynchronous
     def get(self, url):
