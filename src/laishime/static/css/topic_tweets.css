@@ -1,5 +1,10 @@
 body {
-    background: url(http://laisky-blog.qiniudn.com/background-1500x844.jpg) no-repeat fixed 0 0;
+    background-image: url(http://laisky-blog.qiniudn.com/background-1500x844.jpg);
+    -moz-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+    background-attachment: fixed;
 }
 
 p {
