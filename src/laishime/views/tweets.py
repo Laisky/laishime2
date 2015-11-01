@@ -79,7 +79,7 @@ class TopicTweets(BaseHandler):
         tweets = self.db.twitter.tweets
         articles = []
         cursor = tweets.find({'topics': topic}, {'text': 1}) \
-            .sort([('created_at', pymongo.DESCENDING)]) \
+            .sort([('created_at', pymongo.ASCENDING)]) \
             .limit(self._default_n_tweets)
 
         while (yield cursor.fetch_next):
