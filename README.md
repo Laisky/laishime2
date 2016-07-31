@@ -3,7 +3,7 @@ Laishime 2.1
 
 Python3.4 project for fun
 
-[http://hime.laisky.us](http://hime.laisky.us)
+[http://hime.laisky.com](http://localhost:27800/topic_tweets/index.html)
 
 ### Deploy
 

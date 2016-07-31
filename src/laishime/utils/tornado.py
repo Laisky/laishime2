@@ -74,6 +74,8 @@ class BaseHandler(tornado.web.RequestHandler, TemplateRendering):
         This is for making some extra context variables available to
         the template
         """
+        log.debug('render for template_name {}'.format(template_name))
+
         def static_url(path):
             prefix = self.settings.get('static_url_prefix')
             return os.path.join(prefix, path)
