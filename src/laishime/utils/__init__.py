@@ -31,5 +31,5 @@ def setup_log():
     fh.setFormatter(formatter)
     # log
     log = logging.getLogger(LOG_NAME)
-    log.addHandler(ch)
-    log.addHandler(fh)
+    # log.addHandler(ch)
+    # log.addHandler(fh)

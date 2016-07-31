@@ -6,7 +6,7 @@ tornado
 jinja2
 
 # db
-pymongo
+pymongo==2.8
 motor
 
 # api

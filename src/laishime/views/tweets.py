@@ -60,6 +60,7 @@ class TopicTweets(BaseHandler):
             self.finish()
 
     def _render_url(self, text):
+        log.debug('_render_url for text {}'.format(text))
 
         for url in url_regex.findall(text):
             url = ''.join([u for u in url if u])
