@@ -11,6 +11,7 @@ from tornado.web import asynchronous
 from tweepy import API, OAuthHandler
 
 from ..utils import BaseHandler, twitter_api_parser, debug_wrapper
+from ..utils.mongo import update_document
 from ..const import LOG_NAME, url_regex, TWITTER_AUTH
 from ..status import ERROR
 
@@ -173,7 +174,7 @@ class TopicTweets(BaseHandler):
             'topics_count': topics,
             'update_at': datetime.datetime.utcnow()
         }
-        yield self.db.twitter.statistics.update(
+        yield update_document(self.db.twitter.statistics,
             {'collection': docu['collection']},
             {'$set': docu}
         )
@@ -213,7 +214,7 @@ class TopicTweets(BaseHandler):
                     continue
 
                 tweet = twitter_api_parser(tweet)
-                yield tweets.update(
+                yield update_document(tweets,
                     {'id': tweet['id']}, {'$set': tweet}, upsert=True
                 )
                 count += 1
