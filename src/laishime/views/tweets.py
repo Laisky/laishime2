@@ -7,7 +7,7 @@ from collections import Counter, defaultdict
 
 import pymongo
 import tornado
-from tornado.web import asynchronous
+import tornado.gen
 from tweepy import API, OAuthHandler
 
 from ..utils import BaseHandler, twitter_api_parser, debug_wrapper
@@ -23,7 +23,7 @@ class TopicTweets(BaseHandler):
     _default_n_tweets = 100
     _default_n_topics = 8
 
-    @asynchronous
+    @tornado.gen.coroutine
     def get(self, url):
         log.info('TopicTweets from {}'.format(self.ip))
         router = {
@@ -34,7 +34,7 @@ class TopicTweets(BaseHandler):
             'crawler-tweets': self.crawler_tweets,
             'update-statistics': self.update_statistics
         }
-        router.get(url, self.redirect_404)()
+        yield tornado.gen.maybe_future(router.get(url, self.redirect_404)())
 
     @tornado.gen.coroutine
     def index_page(self):

@@ -2,12 +2,12 @@
 pyyaml
 
 # web
-tornado
+tornado==6.5.10
 jinja2
 
 # db
 pymongo==4.6.3
-motor
+motor==3.5.3
 
 # api
 tweepy

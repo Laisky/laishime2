@@ -8,10 +8,10 @@ Qualified environment: Python 3.12.15, PyMongo 4.6.3, Motor 3.5.3 and Tornado
 To reproduce the two old write failures, set LAISHIME_SOURCE_FILE to a copy of
 the pre-repair src/laishime/views/tweets.py; use the same tests and dependencies.
 
-The full application remains blocked on its historical runtime and startup
-interfaces. README specifies Python 3.4.1, while PyMongo 4.6.3 requires >=3.7.
-The resolved current Tornado lacks WSGIApplication and the asynchronous
-decorator, and setup.py imports removed pip.req/pip.download internals. These
-pre-existing startup/prerequisite failures must be resolved before merging or
-claiming full-application acceptance. The focused adapter preserves the
-single-document selector, update payload, upsert flag and yielded driver result.
+Additional regressions import the actual application with fixture configuration,
+construct its HTTP application, exercise delayed request dispatch and 404
+redirects, validate safe authorization YAML and inspect packaging metadata.
+The secure dependency baseline requires Python>=3.10 and is tested on 3.10.22
+and 3.12.15. The historical Python3.4 runtime is not claimed supported.
+Private configuration, real MongoDB/Twitter integration, notebooks and
+deployment are outside this offline acceptance.

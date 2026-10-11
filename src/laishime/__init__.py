@@ -30,7 +30,7 @@ class PageNotFound(BaseHandler):
         self.finish()
 
 
-class Application(tornado.wsgi.WSGIApplication):
+class Application(getattr(tornado.wsgi, 'WSGIApplication', tornado.web.Application)):
     def __init__(self):
         settings = {
             'static_path': os.path.join(CWD, 'static'),
