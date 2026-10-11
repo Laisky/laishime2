@@ -15,3 +15,10 @@ The secure dependency baseline requires Python>=3.10 and is tested on 3.10.22
 and 3.12.15. The historical Python3.4 runtime is not claimed supported.
 Private configuration, real MongoDB/Twitter integration, notebooks and
 deployment are outside this offline acceptance.
+
+The follow-up driver proposal pins PyMongo4.18.3 with Motor3.7.1. The unmodified
+proposal conflicts with Motor3.5.3's PyMongo<4.9 bound and fails dependency
+resolution before tests. The durable suite checks installed dependency
+constraints with pip check and compares packaging metadata to installed driver
+versions; all eleven tests and actual setup.py --name pass on both qualified
+runtimes. Private configuration and actual database/API calls remain excluded.

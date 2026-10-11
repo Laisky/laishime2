@@ -36,9 +36,9 @@ Supervisor 和 Nginx 的配置文件在 `laishime/src/deploy` 中
 
 ## Dependency compatibility acceptance
 
-The PyMongo4.6.3 upgrade requires a newer interpreter than the original Python3.4
+The PyMongo4.18.3 upgrade requires a newer interpreter than the original Python3.4
 experiment. Current acceptance covers Python3.10.22 and Python3.12.15 with
-Motor3.5.3 and Tornado6.5.10. Packaging rejects unsupported older interpreters.
+Motor3.7.1 and Tornado6.5.10. Packaging rejects unsupported older interpreters.
 The compatibility adapter preserves legacy single-document writes and the HTTP
 entry point awaits asynchronous handlers before finishing responses. Existing
 configuration values and deployment files are unchanged.

@@ -1,6 +1,7 @@
 """Actual startup and HTTP dispatch tests with fixture configuration only."""
 import ast
 import io
+import importlib.metadata as metadata
 import logging
 from pathlib import Path
 import re
@@ -55,8 +56,18 @@ class StartupCompatibilityTests(unittest.TestCase):
         with patch("setuptools.setup") as setup:
             runpy.run_path(str(ROOT / "setup.py"), run_name="metadata-control")
         values = setup.call_args.kwargs["install_requires"]
-        self.assertIn("pymongo==4.6.3", values)
-        self.assertIn("motor==3.5.3", values)
+        self.assertIn("pymongo==" + metadata.version("pymongo"), values)
+        self.assertIn("motor==" + metadata.version("motor"), values)
+
+    def test_installed_dependency_constraints_are_satisfied(self):
+        """test_installed_dependency_constraints_are_satisfied guards incompatible driver pins."""
+        import subprocess
+        import sys
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "check"],
+            capture_output=True, text=True, timeout=20,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_authorization_yaml_preserves_plain_data_and_rejects_python_tags(self):
         """test_authorization_yaml_preserves_plain_data_and_rejects_python_tags checks actual loader."""
