@@ -7,10 +7,11 @@ from collections import Counter, defaultdict
 
 import pymongo
 import tornado
-from tornado.web import asynchronous
+import tornado.gen
 from tweepy import API, OAuthHandler
 
 from ..utils import BaseHandler, twitter_api_parser, debug_wrapper
+from ..utils.mongo import update_document
 from ..const import LOG_NAME, url_regex, TWITTER_AUTH
 from ..status import ERROR
 
@@ -22,7 +23,7 @@ class TopicTweets(BaseHandler):
     _default_n_tweets = 100
     _default_n_topics = 8
 
-    @asynchronous
+    @tornado.gen.coroutine
     def get(self, url):
         log.info('TopicTweets from {}'.format(self.ip))
         router = {
@@ -33,7 +34,7 @@ class TopicTweets(BaseHandler):
             'crawler-tweets': self.crawler_tweets,
             'update-statistics': self.update_statistics
         }
-        router.get(url, self.redirect_404)()
+        yield tornado.gen.maybe_future(router.get(url, self.redirect_404)())
 
     @tornado.gen.coroutine
     def index_page(self):
@@ -173,7 +174,7 @@ class TopicTweets(BaseHandler):
             'topics_count': topics,
             'update_at': datetime.datetime.utcnow()
         }
-        yield self.db.twitter.statistics.update(
+        yield update_document(self.db.twitter.statistics,
             {'collection': docu['collection']},
             {'$set': docu}
         )
@@ -213,7 +214,7 @@ class TopicTweets(BaseHandler):
                     continue
 
                 tweet = twitter_api_parser(tweet)
-                yield tweets.update(
+                yield update_document(tweets,
                     {'id': tweet['id']}, {'$set': tweet}, upsert=True
                 )
                 count += 1

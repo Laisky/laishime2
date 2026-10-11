@@ -15,7 +15,13 @@ LOG_LEVEL = logging.DEBUG
 LOG_NAME = 'laishime'
 
 # authorize
-AUTHORIZE = yaml.load(open(os.path.join(CWD, 'config/authorize.yml')))
+def load_authorization(filename):
+    """load_authorization reads plain authorization YAML without Python constructors."""
+    with open(filename) as stream:
+        return yaml.safe_load(stream)
+
+
+AUTHORIZE = load_authorization(os.path.join(CWD, 'config/authorize.yml'))
 TWITTER_AUTH = AUTHORIZE['twitter']
 
 # regex
